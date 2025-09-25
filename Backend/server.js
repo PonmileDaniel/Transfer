@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import { PaymentRepository } from './config/database.js';
+import paymentRoutes from './routes/paymentRoutes.js';
 
 dotenv.config();
 
@@ -64,6 +65,27 @@ app.get('/', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+
+// Routes
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Payment Gateway Service API',
+    status: 'running',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      'POST /api/payments': 'Create payment',
+      'GET /api/payments/:id': 'Get payment by ID',
+      'GET /api/payments/verify/:reference': 'Verify payment',
+      'GET /api/payments': 'Get all payments',
+      'GET /api/payments/user/:email': 'Get payments by email',
+      'GET /api/payments/status/:status': 'Get payments by status'
+    }
+  });
+});
+
+// Payment routes
+app.use('/api/payments', paymentRoutes);
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
