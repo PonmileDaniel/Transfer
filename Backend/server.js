@@ -57,14 +57,6 @@ async function connectDB() {
 
 connectDB();
 
-// Basic route
-app.get('/', (req, res) => {
-  res.json({ 
-    message: 'Payment Gateway Service API',
-    status: 'running',
-    timestamp: new Date().toISOString()
-  });
-});
 
 // Routes
 app.get('/', (req, res) => {

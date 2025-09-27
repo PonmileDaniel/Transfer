@@ -167,7 +167,7 @@ export class PaymentController {
             const { limit = 10 } = req.query;
 
             // Validate status
-            const validStatuses = ['pending', 'successful', 'failed'];
+            const validStatuses = ['pending', 'initialized', 'completed', 'failed'];
             if (!validStatuses.includes(status)) {
                 return res.status(400).json({
                     success: false,
