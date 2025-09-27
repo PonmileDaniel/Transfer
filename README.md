@@ -133,7 +133,7 @@ PORT=5000
 NODE_ENV=development
 
 # Database
-MONGO_DB_URL=mongodb+srv://username:password@cluster.mongodb.net/?retryWrites=true&w=majority&appName=ClusterName
+MONGO_DB_URL= your mongodb url
 
 # JWT Configuration
 JWT_SECRET=your_super_secure_jwt_secret_key_here
