@@ -13,75 +13,67 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_DB_URL = process.env.MONGO_DB_URL;
 
-// Security middleware
+// Middleware
 app.use(helmet());
-app.use(cors());
-
-// Rate limiting
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:5173'],
+  credentials: true
+}));
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100
 });
 app.use(limiter);
-
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-let db;
-let paymentRepository;
 
-// Connecting to MongoDB
-const client = new MongoClient(MONGO_DB_URL, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
-
-async function connectDB() {
+// Main Application Logic
+async function startServer() {
   try {
+    console.log('Connecting to MongoDB...');
+    const client = new MongoClient(MONGO_DB_URL, {
+      serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true }
+    });
     await client.connect();
-    db = client.db("payment");
-    paymentRepository = new PaymentRepository(db);
-    
-    console.log("Connected to MongoDB Atlas");
-    
-    // Make database repository available globally
+    const db = client.db("payment");
+    const paymentRepository = new PaymentRepository(db);
+    console.log('Connected to MongoDB Atlas successfully');
+
+    // 2. Make repository available to the app
     app.locals.db = db;
     app.locals.paymentRepository = paymentRepository;
+
+    // 3. Register Routes
+    app.get('/', (req, res) => {
+      res.json({ 
+        message: 'Payment Gateway Service API',
+        status: 'running',
+        timestamp: new Date().toISOString()
+      });
+    });
+    app.use('/api/payments', paymentRoutes);
+    console.log('Payment routes registered at /api/payments');
+
+    // 4. Register 404 and Error Handlers
+    app.use((req, res) => {
+      res.status(404).json({ success: false, message: `Route ${req.method} ${req.originalUrl} not found` });
+    });
+    app.use((error, req, res, next) => {
+      console.error('Server Error:', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    });
+
+    // 5. Start Listening for Requests
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+
   } catch (err) {
-    console.error("MongoDB connection failed:", err);
+    console.error("Failed to start server:", err);
     process.exit(1);
   }
 }
 
-connectDB();
-
-
-// Routes
-app.get('/', (req, res) => {
-  res.json({ 
-    message: 'Payment Gateway Service API',
-    status: 'running',
-    timestamp: new Date().toISOString(),
-    endpoints: {
-      'POST /api/payments': 'Create payment',
-      'GET /api/payments/:id': 'Get payment by ID',
-      'GET /api/payments/verify/:reference': 'Verify payment',
-      'GET /api/payments': 'Get all payments',
-      'GET /api/payments/user/:email': 'Get payments by email',
-      'GET /api/payments/status/:status': 'Get payments by status'
-    }
-  });
-});
-
-// Payment routes
-app.use('/api/payments', paymentRoutes);
-
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
-export { db, paymentRepository };
-
+// Start the application
+startServer();

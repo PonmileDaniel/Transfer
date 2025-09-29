@@ -14,7 +14,8 @@ export const validatePaymentData = (req, res, next) => {
     metadata: Joi.object().optional()
   });
 
-  const { error, value } = schema.validate(req.body);
+  // Configure validation to return all errors
+  const { error, value } = schema.validate(req.body, { abortEarly: false });
   
   if (error) {
     return res.status(400).json({
