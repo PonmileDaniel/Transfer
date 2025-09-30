@@ -1,0 +1,48 @@
+# Environment files
+.env
+.env.*
+*.env
+
+# Node modules
+node_modules
+npm-debug.log*
+
+# Testing
+coverage/
+.nyc_output
+
+# Development files
+.git
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# IDE files
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
