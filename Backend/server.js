@@ -16,7 +16,7 @@ const MONGO_DB_URL = process.env.MONGO_DB_URL;
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173'],
+  origin: ['http://localhost:3000', 'http://localhost:5173', 'https://transfer-w62h.vercel.app/'],
   credentials: true
 }));
 const limiter = rateLimit({
