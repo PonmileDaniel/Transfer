@@ -6,21 +6,45 @@ import paymentRoutes from '../../../routes/paymentRoutes.js';
 import { validatePaymentData } from '../../../utils/validation.js';
 import { jest } from '@jest/globals';
 
+// Mock external services completely for integration tests
+const mockPaystackService = {
+  initializePayment: jest.fn().mockResolvedValue({
+    success: true,
+    data: {
+      authorization_url: 'https://checkout.paystack.com/test',
+      access_code: 'test_access_code',
+      reference: 'PAY_TEST123'
+    }
+  }),
+  verifyPayment: jest.fn().mockResolvedValue({
+    success: true,
+    data: { status: 'completed', reference: 'PAY_TEST123' }
+  })
+};
+
+const mockFlutterwaveService = {
+  initializePayment: jest.fn().mockResolvedValue({
+    success: true,
+    data: {
+      link: 'https://checkout.flutterwave.com/test',
+      tx_ref: 'FLW_TEST123'
+    }
+  }),
+  verifyPayment: jest.fn().mockResolvedValue({
+    success: true,
+    data: { status: 'completed', reference: 'FLW_TEST123' }
+  })
+};
+
 // tests/integration/routes/paymentRoutes.test.js
 
 // Mock external services for integration tests
 jest.unstable_mockModule('../../../services/PaystackService.js', () => ({
-    PaystackService: jest.fn().mockImplementation(() => ({
-        initializePayment: jest.fn(),
-        verifyPayment: jest.fn()
-    }))
+    PaystackService: jest.fn().mockImplementation(() => mockPaystackService)
 }));
 
 jest.unstable_mockModule('../../../services/FlutterwaveService.js', () => ({
-    FlutterwaveService: jest.fn().mockImplementation(() => ({
-        initializePayment: jest.fn(),
-        verifyPayment: jest.fn()
-    }))
+    FlutterwaveService: jest.fn().mockImplementation(() => mockFlutterwaveService)
 }));
 
 const { PaystackService } = await import('../../../services/PaystackService.js');
@@ -29,8 +53,6 @@ const { FlutterwaveService } = await import('../../../services/FlutterwaveServic
 describe('Payment Routes Integration Tests', () => {
     let app;
     let paymentRepository;
-    let mockPaystackService;
-    let mockFlutterwaveService;
 
     beforeAll(async () => {
         const testDb = await setupTestDatabase();
@@ -55,28 +77,7 @@ describe('Payment Routes Integration Tests', () => {
     beforeEach(async () => {
         await clearTestDatabase();
         
-        // Setup mocks
-        mockPaystackService = new PaystackService();
-        mockFlutterwaveService = new FlutterwaveService();
-        
         // Mock successful payment initialization
-        mockPaystackService.initializePayment.mockResolvedValue({
-            success: true,
-            data: {
-                authorization_url: 'https://checkout.paystack.com/test',
-                access_code: 'test_access_code',
-                reference: 'PAY_TEST123'
-            }
-        });
-
-        mockFlutterwaveService.initializePayment.mockResolvedValue({
-            success: true,
-            data: {
-                link: 'https://checkout.flutterwave.com/test',
-                tx_ref: 'FLW_TEST123'
-            }
-        });
-        
         jest.clearAllMocks();
     });
 
