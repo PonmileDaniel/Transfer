@@ -13,12 +13,47 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_DB_URL = process.env.MONGO_DB_URL;
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+
+});
+
 // Middleware
 app.use(helmet());
+
+// Dynamic CORS configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  process.env.FRONTEND_URL,
+].filter(Boolean); // Remove any undefined values
+
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173', 'https://transfer-w62h.vercel.app/'],
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is in allowed list or matches Vercel pattern
+    if (allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin)) {
+      return callback(null, true);
+    }
+    
+    // Log rejected origins for debugging
+    console.log('CORS rejected origin:', origin);
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
 }));
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100
