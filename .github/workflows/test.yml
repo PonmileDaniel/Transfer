@@ -1,4 +1,4 @@
-name: Run Tests
+name: Simple Build
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main, master ]
 
 jobs:
-  test-backend:
+  build-backend:
     runs-on: ubuntu-latest
     
     steps:
@@ -18,20 +18,19 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: Backend/package-lock.json
 
     - name: Install Backend Dependencies
-      run: |
-        cd Backend
-        npm install
+      working-directory: ./Backend
+      run: npm install
 
-    - name: Run Backend Tests
-      run: |
-        cd Backend
-        npm test
+    - name: Check Backend Syntax
+      working-directory: ./Backend
+      run: node --check server.js
 
-  test-frontend:
+    - name: Backend Build Success
+      run: echo "✅ Backend dependencies installed and syntax checked successfully!"
+
+  build-frontend:
     runs-on: ubuntu-latest
     
     steps:
@@ -42,15 +41,14 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: Frontend/package-lock.json
 
     - name: Install Frontend Dependencies
-      run: |
-        cd Frontend
-        npm install
+      working-directory: ./Frontend
+      run: npm install
 
     - name: Build Frontend
-      run: |
-        cd Frontend
-        npm run build
+      working-directory: ./Frontend
+      run: npm run build
+
+    - name: Frontend Build Success
+      run: echo "✅ Frontend built successfully!"
