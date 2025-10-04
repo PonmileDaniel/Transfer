@@ -1,10 +1,6 @@
 import { PaymentService } from "../services/PaymentService.js";
 
 export class PaymentController {
-    constructor() {
-        // PaymentService will be injected via middleware
-    }
-
     /**
      * Create a new payment
      * POST /api/payments
@@ -51,10 +47,8 @@ export class PaymentController {
         try {
             const { reference } = req.params;
 
-            // Get PaymentService instance from app locals
             const paymentService = new PaymentService(req.app.locals.paymentRepository);
 
-            // Verify payment
             const result = await paymentService.verifyPayment(reference);
 
             if (result.success) {
@@ -85,10 +79,8 @@ export class PaymentController {
         try {
             const { limit = 10, skip = 0 } = req.query;
 
-            // Get PaymentService instance
             const paymentService = new PaymentService(req.app.locals.paymentRepository);
 
-            // Fetch payemnt
             const result = await paymentService.getAllPayments(
                 parseInt(limit),
                 parseInt(skip)
@@ -129,10 +121,8 @@ export class PaymentController {
             const { email } = req.params;
             const { limit = 10 } = req.query;
 
-            // Get PaymentService instance
             const paymentService = new PaymentService(req.app.locals.paymentRepository);
 
-            // Fetch payments by email
             const result = await paymentService.getPaymentsByEmail(
                 email,
                 parseInt(limit)
@@ -166,7 +156,6 @@ export class PaymentController {
             const { status } = req.params;
             const { limit = 10 } = req.query;
 
-            // Validate status
             const validStatuses = ['pending', 'initialized', 'completed', 'failed'];
             if (!validStatuses.includes(status)) {
                 return res.status(400).json({
@@ -176,7 +165,6 @@ export class PaymentController {
                 });
             }
 
-            // Get PaymentService instance
             const paymentService = new PaymentService(req.app.locals.paymentRepository);
 
             // Fetch payments by status
@@ -219,8 +207,7 @@ export class PaymentController {
                     message: 'Payment reference is required'
                 });
             }
-
-            // Get PaymentService instance
+e
             const paymentService = new PaymentService(req.app.locals.paymentRepository);
 
             // Verify the payment
