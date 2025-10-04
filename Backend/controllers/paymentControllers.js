@@ -9,10 +9,8 @@ export class PaymentController {
         try {
             const { amount, currency, email, metadata } = req.body;
 
-            // Get PaymentService intsance from app locals
             const paymentService = new PaymentService(req.app.locals.paymentRepository);
 
-            // Create payment
             const result = await paymentService.createPayment({
                 amount,
                 currency,
@@ -167,7 +165,7 @@ export class PaymentController {
 
             const paymentService = new PaymentService(req.app.locals.paymentRepository);
 
-            // Fetch payments by status
+
             const result = await paymentService.getPaymentsByStatus(
                 status,
                 parseInt(limit)
@@ -207,18 +205,14 @@ export class PaymentController {
                     message: 'Payment reference is required'
                 });
             }
-e
             const paymentService = new PaymentService(req.app.locals.paymentRepository);
 
-            // Verify the payment
             const result = await paymentService.verifyPayment(reference);
 
             if (result.success) {
-                // Redirect to the fronted with success
                 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
                 return res.redirect(`${frontendUrl}/payment/success?reference=${reference}&status=${result.data.status}`);
             } else {
-                // Redirect to frontend with failure
                 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
                 return res.redirect(`${frontendUrl}/payment/failed?reference=${reference}&error=${encodeURIComponent(result.error)}`);
             }
@@ -236,10 +230,8 @@ e
         try {
             const { id } = req.params;
 
-            // Get PaymentService instance
             const paymentService = new PaymentService(req.app.locals.paymentRepository);
 
-            // Get payment
             const result = await paymentService.getPayment(id);
 
             if (result.success) {

@@ -6,7 +6,7 @@ export class Payment {
         this.email = data.email;
         this.reference = data.reference || this.generateReference();
         this.status = data.status || 'pending';
-        this.provider = data.provider; // e.g., 'flutterwave'
+        this.provider = data.provider;
         this.providerReference = data.providerReference;
         this.authorizationUrl = data.authorizationUrl;
         this.metadata = data.metadata || {};
