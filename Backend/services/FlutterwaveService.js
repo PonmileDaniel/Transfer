@@ -62,19 +62,17 @@ export class FlutterwaveService {
         } catch (error) {
             console.error('FlutterwaveService.initializePayment error:', error);
             if (error.response) {
-                // Flutterwave API error
                 return {
                     success: false,
                     error: error.response.data.message || 'Payment initialization failed'
                 };
             } else if (error.request) {
-                // Network error
                 return {
                     success: false,
                     error: 'Network error - Unable to connect to Flutterwave'
                 };
             } else {
-                // Other error
+
                 return {
                     success: false,
                     error: error.message || 'Unknown error occurred'
@@ -136,19 +134,16 @@ export class FlutterwaveService {
             console.error('FlutterwaveService.verifyPayment error:', error);
 
             if (error.response) {
-                // Flutterwave API error
                 return {
                     success: false,
                     error: error.response.data.message || 'Flutterwave verification error'
                 }
             } else if (error.request) {
-                // Network error
                 return {
                     success: false,
                     error: 'Network error - Unable to connect to Flutterwave'
                 };
             } else {
-                // other error
                 return {
                     success: false,
                     error: error.message || 'Unknown error occurred'
