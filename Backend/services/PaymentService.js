@@ -15,17 +15,6 @@ export class PaymentService {
    */
   async createPayment(paymentData) {
     try {
-      // 1. Validate payment data
-      const validation = Payment.validate(paymentData);
-      if (!validation.isValid) {
-        return {
-          success: false,
-          error: 'Validation failed',
-          details: validation.errors
-        };
-      }
-
-      // 2. Create payment object
       const payment = new Payment(paymentData);
 
       // 3. Determine payment provider based on currency

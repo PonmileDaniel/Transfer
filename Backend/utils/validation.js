@@ -14,7 +14,6 @@ export const validatePaymentData = (req, res, next) => {
     metadata: Joi.object().optional()
   });
 
-  // Configure validation to return all errors
   const { error, value } = schema.validate(req.body, { abortEarly: false });
   
   if (error) {
@@ -28,3 +27,27 @@ export const validatePaymentData = (req, res, next) => {
   req.body = value;
   next();
 };
+
+export const validatePaymentId = (req, res, next) => {
+  const { id } = req.params;
+
+  if (!id || id.length < 10) {
+    return res.status(400).json({
+      success: false,
+      messages: "Invalid payment ID format"
+    })
+  }
+  next();
+}
+
+export const validatePaymentReference = (req, res, next) => {
+  const { reference } = req.params;
+
+  if (!reference || !/^[A-Z0-9_-]+$/i.test(reference)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid payment reference format'
+    })
+  }
+  next();
+}

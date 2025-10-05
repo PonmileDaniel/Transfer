@@ -44,11 +44,6 @@ export class Payment {
         };
     }
 
-    static isValidEmail(email){
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-
     toJSON() {
         return {
             id: this.id,
