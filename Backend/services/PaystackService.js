@@ -55,19 +55,16 @@ export class PaystackService {
       console.error('PaystackService.initializePayment error:', error);
       
       if (error.response) {
-        // Paystack API error
         return {
           success: false,
           error: error.response.data.message || 'Paystack API error'
         };
       } else if (error.request) {
-        // Network error
         return {
           success: false,
           error: 'Network error - Unable to connect to Paystack'
         };
       } else {
-        // Other error
         return {
           success: false,
           error: error.message || 'Unknown error occurred'
@@ -128,19 +125,16 @@ export class PaystackService {
       console.error('PaystackService.verifyPayment error:', error);
       
       if (error.response) {
-        // Paystack API error
         return {
           success: false,
           error: error.response.data.message || 'Paystack verification error'
         };
       } else if (error.request) {
-        // Network error
         return {
           success: false,
           error: 'Network error - Unable to connect to Paystack'
         };
       } else {
-        // Other error
         return {
           success: false,
           error: error.message || 'Unknown error occurred'

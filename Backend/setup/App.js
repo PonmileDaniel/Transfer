@@ -17,8 +17,6 @@ export class App {
 
         this.configureMiddleware();
         this.configureSecurity()
-        
-    
     }
 
     configureMiddleware() {

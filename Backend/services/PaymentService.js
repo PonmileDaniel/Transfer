@@ -16,12 +16,9 @@ export class PaymentService {
   async createPayment(paymentData) {
     try {
       const payment = new Payment(paymentData);
-
-      // 3. Determine payment provider based on currency
       const provider = this.selectPaymentProvider(payment.currency);
       payment.provider = provider;
 
-      // 4. Save payment to database (status: pending)
       const saveResult = await this.paymentRepository.createPayment(payment.toJSON());
       if (!saveResult.success) {
         return {
@@ -31,7 +28,6 @@ export class PaymentService {
         };
       }
 
-      // 5. Initialize payment with selected provider
       let providerResponse;
       if (provider === 'paystack') {
         providerResponse = await this.paystackService.initializePayment(payment);
@@ -39,9 +35,7 @@ export class PaymentService {
         providerResponse = await this.flutterwaveService.initializePayment(payment);
       }
 
-      // 6. Handle provider response
       if (!providerResponse.success) {
-        // Update payment status to failed
         await this.paymentRepository.updatePayment(payment.id, {
           status: 'failed',
           error: providerResponse.error
@@ -54,7 +48,6 @@ export class PaymentService {
         };
       }
 
-      // 7. Update payment with provider response data
       const updateData = {
         authorizationUrl: providerResponse.data.authorizationUrl,
         providerReference: providerResponse.data.reference || providerResponse.data.accessCode,
@@ -62,8 +55,6 @@ export class PaymentService {
       };
 
       await this.paymentRepository.updatePayment(payment.id, updateData);
-
-      // 8. Return success response
       return {
         success: true,
         data: {
@@ -92,7 +83,6 @@ export class PaymentService {
    */
   async verifyPayment(reference) {
     try {
-      // 1. Find payment in database
       const paymentResult = await this.paymentRepository.findPaymentByReference(reference);
       if (!paymentResult.success || !paymentResult.data) {
         return {
@@ -103,7 +93,6 @@ export class PaymentService {
 
       const payment = paymentResult.data;
 
-      // 2. Skip verification if already completed
       if (payment.status === 'completed') {
         return {
           success: true,
@@ -118,7 +107,6 @@ export class PaymentService {
         };
       }
 
-      // 3. Verify with payment provider
       let verificationResponse;
       if (payment.provider === 'paystack') {
         verificationResponse = await this.paystackService.verifyPayment(reference);
@@ -126,7 +114,6 @@ export class PaymentService {
         verificationResponse = await this.flutterwaveService.verifyPayment(reference);
       }
 
-      // 4. Handle verification response
       if (!verificationResponse.success) {
         return {
           success: false,
@@ -135,7 +122,6 @@ export class PaymentService {
         };
       }
 
-      // 5. Update payment status in database
       const updateData = {
         status: verificationResponse.data.status,
         verifiedAt: new Date()
@@ -147,7 +133,6 @@ export class PaymentService {
 
       await this.paymentRepository.updatePayment(payment.id, updateData);
 
-      // 6. Return verification result
       return {
         success: true,
         data: {

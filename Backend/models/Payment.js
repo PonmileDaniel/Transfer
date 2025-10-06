@@ -23,27 +23,6 @@ export class Payment {
         return 'PAY_' + Date.now().toString() + Math.random().toString(36).substr(2, 5).toUpperCase();
     }
 
-    static validate(data) {
-        const errors = [];
-
-        if (!data.amount || data.amount <= 0) {
-            errors.push("Amount must be a positive number.")
-        }
-
-        if (!data.email || !this.isValidEmail(data.email)) {
-            errors.push("Invalid email address.")
-        }
-
-        if (data.currency && !['NGN', 'USD', 'GHS', 'KES'].includes(data.currency)) {
-            errors.push("Unsupported currency. Supported currencies are NGN, USD, GHS, KES.")
-        }
-
-        return {
-            isValid: errors.length === 0,
-            errors
-        };
-    }
-
     toJSON() {
         return {
             id: this.id,
